@@ -1,0 +1,16 @@
+Capital Enforcer automatically converts all text inputs to uppercase on Veryon Tracking+ pages.
+
+HOW IT WORKS
+Once installed, every text field and textarea on Tracking+ is transformed to uppercase as you type. Pasted text is converted automatically. The extension handles dynamically loaded fields, so it works seamlessly across the entire application.
+
+FEATURES
+• Automatic uppercase conversion on all text inputs
+• Handles paste events with instant conversion
+• Works with dynamically added fields (modals, tabs, etc.)
+• Preserves cursor position while typing
+• Preserves the German Eszett (ß) character
+• Simple on/off toggle via the popup
+• Lightweight — no background processes, no network requests
+
+PRIVACY
+This extension operates entirely within your browser. It does not collect, transmit, or store any personal data. No analytics, no tracking, no network requests. Your enable/disable preference is stored locally on your device.
