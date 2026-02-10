@@ -1,0 +1,59 @@
+@import 'tailwindcss';
+
+/* Base reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  @apply font-sans;
+  width: 260px;
+}
+
+.popup {
+  @apply p-4;
+}
+
+.popup h1 {
+  @apply mb-3 text-[15px] font-semibold text-gray-800;
+}
+
+.toggle-row {
+  @apply mb-3 flex items-center gap-2.5;
+}
+
+.status {
+  @apply text-[13px] font-medium text-gray-500;
+}
+
+.description {
+  @apply text-xs text-gray-400;
+}
+
+/* iOS-style toggle switch */
+.switch {
+  @apply relative inline-block h-[22px] w-10 shrink-0;
+}
+
+.switch input {
+  @apply h-0 w-0 opacity-0;
+}
+
+.slider {
+  @apply absolute inset-0 cursor-pointer rounded-[22px] bg-gray-300 transition-colors duration-200;
+}
+
+.slider::before {
+  content: '';
+  @apply absolute bottom-[2px] left-[2px] h-[18px] w-[18px] rounded-full bg-white transition-transform duration-200;
+}
+
+input:checked + .slider {
+  @apply bg-blue-500;
+}
+
+input:checked + .slider::before {
+  transform: translateX(18px);
+}

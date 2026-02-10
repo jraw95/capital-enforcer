@@ -1,0 +1,29 @@
+{
+  "name": "capital-enforcer",
+  "description": "Forces all text into uppercase across the Veryon Tracking+",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "wxt",
+    "build": "wxt build",
+    "build:firefox": "wxt build --browser firefox",
+    "zip": "wxt zip",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "postinstall": "wxt prepare"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.1.18",
+    "tailwindcss": "^4.1.18",
+    "wxt": "^0.20.14"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "happy-dom": "^20.6.0",
+    "vitest": "^4.0.18"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}
