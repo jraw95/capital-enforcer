@@ -10,18 +10,36 @@ interface FieldHandlers {
 const handlerMap = new WeakMap<TextField, FieldHandlers>()
 const processedFields = new Set<TextField>()
 let observer: MutationObserver | null = null
+let exemptSelectors: string[] = []
 
 export function enforceUppercase(element: TextField): void {
+  const upper = toUppercasePreserveEszett(element.value)
+  if (element.value === upper) return
   const start = element.selectionStart
   const end = element.selectionEnd
-  element.value = toUppercasePreserveEszett(element.value)
+  element.value = upper
   if (start !== null && end !== null) {
     element.setSelectionRange(start, end)
   }
 }
 
+export function isCombobox(field: TextField): boolean {
+  return field.id.startsWith('ruscombo_')
+}
+
+export function isExempt(field: TextField): boolean {
+  return exemptSelectors.some((selector) => {
+    try {
+      return field.matches(selector)
+    } catch {
+      return false
+    }
+  })
+}
+
 export function attachListeners(field: TextField): void {
   if (handlerMap.has(field)) return
+  if (isExempt(field) || isCombobox(field)) return
 
   const inputHandler = (): void => {
     enforceUppercase(field)
@@ -103,6 +121,22 @@ function stopObserver(): void {
   }
 }
 
+function loadExemptSelectors(): Promise<void> {
+  return new Promise((resolve) => {
+    chrome.storage.local.get({ exemptSelectors: [] }, (result) => {
+      exemptSelectors = result.exemptSelectors
+      resolve()
+    })
+  })
+}
+
+function reprocessAllFields(): void {
+  for (const field of processedFields) {
+    detachListeners(field)
+  }
+  processAllTextFields()
+}
+
 function activate(): void {
   processAllTextFields()
   startObserver()
@@ -115,11 +149,17 @@ function deactivate(): void {
   }
 }
 
+export function _setExemptSelectorsForTesting(selectors: string[]): void {
+  exemptSelectors = selectors
+}
+
 export default defineContentScript({
   matches: ['https://test-trackingplus.acc-cjs.net/*'],
   runAt: 'document_end',
 
-  main() {
+  async main() {
+    await loadExemptSelectors()
+
     chrome.storage.local.get({ enabled: true }, (result) => {
       if (result.enabled) {
         activate()
@@ -127,11 +167,17 @@ export default defineContentScript({
     })
 
     chrome.storage.onChanged.addListener((changes, area) => {
-      if (area !== 'local' || !changes.enabled) return
-      if (changes.enabled.newValue) {
-        activate()
-      } else {
-        deactivate()
+      if (area !== 'local') return
+      if (changes.enabled) {
+        if (changes.enabled.newValue) {
+          activate()
+        } else {
+          deactivate()
+        }
+      }
+      if (changes.exemptSelectors) {
+        exemptSelectors = changes.exemptSelectors.newValue ?? []
+        reprocessAllFields()
       }
     })
   },

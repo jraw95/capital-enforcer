@@ -17,6 +17,21 @@
       <p class="description">
         Forces text inputs to uppercase on Tracking+
       </p>
+      <div class="exempt-section">
+        <button class="exempt-toggle" id="exempt-toggle">
+          <span class="arrow" id="exempt-arrow">&#9654;</span>
+          Exempt Fields
+        </button>
+        <div class="exempt-panel hidden" id="exempt-panel">
+          <textarea
+            class="exempt-input"
+            id="exempt-input"
+            rows="4"
+            placeholder="#rustextarea_address&#10;.no-uppercase&#10;[data-skip-caps]"
+          ></textarea>
+          <button class="exempt-save" id="exempt-save">Save</button>
+        </div>
+      </div>
     </div>
     <script type="module" src="./main.ts"></script>
   </body>

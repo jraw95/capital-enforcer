@@ -4,6 +4,9 @@ import {
   enforceUppercase,
   attachListeners,
   detachListeners,
+  isCombobox,
+  isExempt,
+  _setExemptSelectorsForTesting,
 } from '@/entrypoints/content'
 
 function createInput(value = ''): HTMLInputElement {
@@ -107,6 +110,122 @@ describe('attachListeners / detachListeners', () => {
   it('detach is safe to call when not attached', () => {
     const input = createInput()
     expect(() => detachListeners(input)).not.toThrow()
+  })
+})
+
+describe('enforceUppercase optimization', () => {
+  it('skips .value set when already uppercase', () => {
+    const input = createInput('HELLO')
+    const descriptor = Object.getOwnPropertyDescriptor(
+      HTMLInputElement.prototype,
+      'value',
+    )!
+    const setter = vi.fn(descriptor.set!)
+    Object.defineProperty(input, 'value', {
+      get: descriptor.get!,
+      set: setter,
+      configurable: true,
+    })
+
+    enforceUppercase(input)
+    expect(setter).not.toHaveBeenCalled()
+  })
+
+  it('sets .value when conversion is needed', () => {
+    const input = createInput('hello')
+    enforceUppercase(input)
+    expect(input.value).toBe('HELLO')
+  })
+})
+
+describe('isCombobox', () => {
+  it('returns true for ruscombo_ prefix IDs', () => {
+    const input = createInput()
+    input.id = 'ruscombo_location'
+    expect(isCombobox(input)).toBe(true)
+  })
+
+  it('returns false for other IDs', () => {
+    const input = createInput()
+    input.id = 'rustextarea_notes'
+    expect(isCombobox(input)).toBe(false)
+  })
+
+  it('returns false for empty ID', () => {
+    const input = createInput()
+    expect(isCombobox(input)).toBe(false)
+  })
+})
+
+describe('combobox fields are skipped', () => {
+  function createCombobox(value = ''): HTMLInputElement {
+    const input = createInput(value)
+    input.id = 'ruscombo_location'
+    return input
+  }
+
+  it('does not attach any listeners to combobox fields', () => {
+    const combo = createCombobox()
+    attachListeners(combo)
+
+    combo.value = 'hello'
+    combo.dispatchEvent(new Event('input'))
+    expect(combo.value).toBe('hello')
+  })
+
+  it('does not uppercase existing value on attach', () => {
+    const combo = createCombobox('hello')
+    attachListeners(combo)
+    expect(combo.value).toBe('hello')
+  })
+})
+
+describe('exempt fields', () => {
+  beforeEach(() => {
+    _setExemptSelectorsForTesting([])
+  })
+
+  it('skips exempt fields', () => {
+    _setExemptSelectorsForTesting(['#skip-me'])
+    const input = createInput()
+    input.id = 'skip-me'
+    attachListeners(input)
+
+    input.value = 'hello'
+    input.dispatchEvent(new Event('input'))
+    expect(input.value).toBe('hello')
+  })
+
+  it('attaches to non-exempt fields normally', () => {
+    _setExemptSelectorsForTesting(['#skip-me'])
+    const input = createInput()
+    input.id = 'keep-me'
+    attachListeners(input)
+
+    input.value = 'hello'
+    input.dispatchEvent(new Event('input'))
+    expect(input.value).toBe('HELLO')
+  })
+
+  it('handles invalid selectors without crashing', () => {
+    _setExemptSelectorsForTesting(['[invalid!!!'])
+    const input = createInput()
+    expect(() => attachListeners(input)).not.toThrow()
+    expect(isExempt(input)).toBe(false)
+  })
+
+  it('supports class selectors', () => {
+    _setExemptSelectorsForTesting(['.no-uppercase'])
+    const input = createInput()
+    input.classList.add('no-uppercase')
+    expect(isExempt(input)).toBe(true)
+  })
+
+  it('supports attribute selectors', () => {
+    _setExemptSelectorsForTesting(['[data-skip-caps]'])
+    const input = createInput()
+    input.setAttribute('data-skip-caps', '')
+    expect(isExempt(input)).toBe(true)
   })
 })
 
