@@ -57,3 +57,36 @@ input:checked + .slider {
 input:checked + .slider::before {
   transform: translateX(18px);
 }
+
+/* Exempt fields section */
+.exempt-section {
+  @apply mt-3 border-t border-gray-200 pt-3;
+}
+
+.exempt-toggle {
+  @apply flex w-full cursor-pointer items-center gap-1.5 border-none bg-transparent p-0 text-xs text-gray-500 hover:text-gray-700;
+}
+
+.arrow {
+  @apply inline-block text-[8px] transition-transform duration-200;
+}
+
+.arrow.open {
+  transform: rotate(90deg);
+}
+
+.exempt-panel {
+  @apply mt-2;
+}
+
+.exempt-panel.hidden {
+  @apply hidden;
+}
+
+.exempt-input {
+  @apply w-full resize-y rounded border border-gray-300 p-1.5 font-mono text-[11px] leading-relaxed text-gray-700 focus:border-blue-400 focus:outline-none;
+}
+
+.exempt-save {
+  @apply mt-1.5 cursor-pointer rounded border-none bg-blue-500 px-3 py-1 text-[11px] text-white hover:bg-blue-600;
+}

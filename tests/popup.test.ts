@@ -1,6 +1,6 @@
 import { describe, expect, it, beforeEach } from 'vitest'
 import { fakeBrowser } from 'wxt/testing'
-import { updateUI } from '@/entrypoints/popup/main'
+import { updateUI, parseExemptSelectors } from '@/entrypoints/popup/main'
 
 function createToggle(): HTMLInputElement {
   const toggle = document.createElement('input')
@@ -32,6 +32,28 @@ describe('updateUI', () => {
     updateUI(toggle, status, false)
     expect(toggle.checked).toBe(false)
     expect(status.textContent).toBe('Inactive')
+  })
+})
+
+describe('parseExemptSelectors', () => {
+  it('splits by newline and trims', () => {
+    expect(parseExemptSelectors('#foo\n  .bar  \n[data-x]')).toEqual([
+      '#foo',
+      '.bar',
+      '[data-x]',
+    ])
+  })
+
+  it('filters empty lines', () => {
+    expect(parseExemptSelectors('#foo\n\n\n.bar\n')).toEqual(['#foo', '.bar'])
+  })
+
+  it('returns empty array for empty string', () => {
+    expect(parseExemptSelectors('')).toEqual([])
+  })
+
+  it('returns empty array for whitespace-only input', () => {
+    expect(parseExemptSelectors('  \n  \n  ')).toEqual([])
   })
 })
 

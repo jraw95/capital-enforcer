@@ -7,7 +7,7 @@ export default defineConfig({
   }),
   manifest: {
     name: 'Capital Enforcer',
-    version: '1.0.0',
+    version: '1.1.0',
     description:
       'Forces all text into uppercase across the Veryon Tracking+',
     permissions: ['storage'],

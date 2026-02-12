@@ -2,7 +2,7 @@
   "name": "capital-enforcer",
   "description": "Forces all text into uppercase across the Veryon Tracking+",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.1.0",
   "type": "module",
   "scripts": {
     "dev": "wxt",
